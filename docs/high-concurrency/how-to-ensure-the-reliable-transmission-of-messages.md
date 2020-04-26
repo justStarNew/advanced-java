@@ -10,7 +10,7 @@
 数据的丢失问题，可能出现在生产者、MQ、消费者中，咱们从 RabbitMQ 和 Kafka 分别来分析一下吧。
 
 ### RabbitMQ
-![rabbitmq-message-lose](/images/rabbitmq-message-lose.png)
+![rabbitmq-message-lose](./images/rabbitmq-message-lose.png)
 
 #### 生产者弄丢了数据
 
@@ -36,7 +36,7 @@ channel.txCommit
 
 所以一般来说，如果你要确保说写 RabbitMQ 的消息别丢，可以开启 `confirm` 模式，在生产者那里设置开启 `confirm` 模式之后，你每次写的消息都会分配一个唯一的 id，然后如果写入了 RabbitMQ 中，RabbitMQ 会给你回传一个 `ack` 消息，告诉你说这个消息 ok 了。如果 RabbitMQ 没能处理这个消息，会回调你的一个 `nack` 接口，告诉你这个消息接收失败，你可以重试。而且你可以结合这个机制自己在内存里维护每个消息 id 的状态，如果超过一定时间还没接收到这个消息的回调，那么你可以重发。
 
-事务机制和 `cnofirm` 机制最大的不同在于，**事务机制是同步的**，你提交一个事务之后会**阻塞**在那儿，但是 `confirm` 机制是**异步**的，你发送个消息之后就可以发送下一个消息，然后那个消息 RabbitMQ 接收了之后会异步回调你的一个接口通知你这个消息接收到了。
+事务机制和 `confirm` 机制最大的不同在于，**事务机制是同步的**，你提交一个事务之后会**阻塞**在那儿，但是 `confirm` 机制是**异步**的，你发送个消息之后就可以发送下一个消息，然后那个消息 RabbitMQ 接收了之后会异步回调你的一个接口通知你这个消息接收到了。
 
 所以一般在生产者这块**避免数据丢失**，都是用 `confirm` 机制的。
 
@@ -61,7 +61,7 @@ RabbitMQ 如果丢失了数据，主要是因为你消费的时候，**刚消费
 
 这个时候得用 RabbitMQ 提供的 `ack` 机制，简单来说，就是你必须关闭 RabbitMQ 的自动 `ack`，可以通过一个 api 来调用就行，然后每次你自己代码里确保处理完的时候，再在程序里 `ack` 一把。这样的话，如果你还没处理完，不就没有 `ack` 了？那 RabbitMQ 就认为你还没处理完，这个时候 RabbitMQ 会把这个消费分配给别的 consumer 去处理，消息是不会丢的。
 
-![rabbitmq-message-lose-solution](/images/rabbitmq-message-lose-solution.png)
+![rabbitmq-message-lose-solution](./images/rabbitmq-message-lose-solution.png)
 
 ### Kafka
 
