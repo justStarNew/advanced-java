@@ -1,8 +1,5 @@
 # 服务发现组件 Eureka 的几个主要调用过程
 
-* Author: [mghio](https://www.mghio.cn)
-* Description: 该文主要讲述服务发现组件 Eureka 的几个主要调用过程
-
 ## 前言
 
 现在流行的微服务体系结构正在改变我们构建应用程序的方式，从单一的单体服务转变为越来越小的可单独部署的服务（称为 `微服务` ），共同构成了我们的应用程序。当进行一个业务时不可避免就会存在多个服务之间调用，假如一个服务 A 要访问在另一台服务器部署的服务 B，那么前提是服务 A 要知道服务 B 所在机器的 IP 地址和服务对应的端口，最简单的方式就是让服务 A 自己去维护一份服务 B 的配置（包含 IP 地址和端口等信息），但是这种方式有几个明显的缺点：随着我们调用服务数量的增加，配置文件该如何维护；缺乏灵活性，如果服务 B 改变 IP 地址或者端口，服务 A 也要修改相应的文件配置；还有一个就是进行服务的动态扩容或缩小不方便。
@@ -18,7 +15,7 @@ At Netflix, Eureka is used for the following purposes apart from playing a criti
 
 `Eureka` 是由 [Netflix](https://www.netflix.com) 公司开源，采用的是 Client / Server 模式进行设计，基于 http 协议和使用 Restful Api 开发的服务注册与发现组件，提供了完整的服务注册和服务发现，可以和 `Spring Cloud` 无缝集成。其中 Server 端扮演着服务注册中心的角色，主要是为 Client 端提供服务注册和发现等功能，维护着 Client 端的服务注册信息，同时定期心跳检测已注册的服务当不可用时将服务剔除下线，Client 端可以通过 Server 端获取自身所依赖服务的注册信息，从而完成服务间的调用。遗憾的是从其官方的 [github wiki](https://github.com/Netflix/eureka/wik) 可以发现，2.0 版本已经不再开源。但是不影响我们对其进行深入了解，毕竟服务注册、服务发现相对来说还是比较基础和通用的，其它开源实现框架的思想也是想通的。
 
-## 服务注册中心（Eureka Server） 
+## 服务注册中心（Eureka Server）
 
 我们在项目中引入 `Eureka Server` 的相关依赖，然后在启动类加上注解 `@EnableEurekaServer` ，就可以将其作为注册中心，启动服务后访问页面如下：
 
@@ -27,8 +24,6 @@ At Netflix, Eureka is used for the following purposes apart from playing a criti
 我们继续添加两个模块 `service-provider` ， `service-consumer` ，然后在启动类加上注解 `@EnableEurekaClient` 并指定注册中心地址为我们刚刚启动的 `Eureka Server` ，再次访问可以看到两个服务都已经注册进来了。
 
 ![eureka-instance-registered-currently.png](./images/eureka-instance-registered-currently.png)
-
-`Demo` 仓库地址：https://github.com/mghio/depth-in-springcloud
 
 可以看到 `Eureka` 的使用非常简单，只需要添加几个注解和配置就实现了服务注册和服务发现，接下来我们看看它是如何实现这些功能的。
 
@@ -123,7 +118,8 @@ At Netflix, Eureka is used for the following purposes apart from playing a criti
 
 工作中项目使用的是 `Spring Cloud` 技术栈，它有一套非常完善的开源代码来整合 `Eureka` ，使用起来非常方便。之前都是直接加注解和修改几个配置属性一气呵成的，没有深入了解过源码实现，本文主要是阐述了服务注册、服务发现等相关过程和实现方式，对 `Eureka` 服务发现组件有了更近一步的了解。
 
---- 
+---
+
 参考文章
 
 [Netflix Eureka](https://github.com/Netflix/eureka)
